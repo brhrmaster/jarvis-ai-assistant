@@ -1,7 +1,3 @@
-# PyJarvis - AI Assistant
-
-A Python implementation of the Jarvis text-to-voice assistant with animated digital face, LLM integration, and speech recognition.
-
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](https://www.python.org/)
 [![Pygame](https://img.shields.io/badge/Pygame-2.5.0-green?logo=python)](https://www.pygame.org/)
 [![Edge TTS](https://img.shields.io/badge/Edge%20TTS-6.1.0-blue?logo=microsoft)](https://github.com/rany2/edge-tts)
@@ -11,6 +7,11 @@ A Python implementation of the Jarvis text-to-voice assistant with animated digi
 [![Pydantic](https://img.shields.io/badge/Pydantic-2.5.0%2B-ff69b4?logo=pydantic)](https://docs.pydantic.dev/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.1.0-EE4C2C?logo=pytorch)](https://pytorch.org/)
 [![Transformers](https://img.shields.io/badge/Transformers-4.35.0-yellow?logo=huggingface)](https://huggingface.co/transformers/)
+
+
+# PyJarvis - AI Assistant
+
+A Python implementation of the Jarvis text-to-voice assistant with animated digital face, LLM integration, and speech recognition.
 
 ![UI](docs/ui-demo.png)
 

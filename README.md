@@ -2,6 +2,8 @@
 
 A Python implementation of the Jarvis text-to-voice assistant with animated digital face, LLM integration, and speech recognition.
 
+![UI](docs/ui-demo.png)
+
 ## Architecture
 
 Modular Python application following Clean Architecture, SOLID principles, and Design Patterns:

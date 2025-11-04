@@ -1,0 +1,54 @@
+# Core dependencies
+pydantic>=2.5.0
+typing-extensions>=4.8.0
+
+# Serialization
+orjson>=3.9.0
+
+# GUI (Pygame for animated face)
+pygame>=2.5.0
+
+# TTS Engine
+gtts>=2.5.0
+edge-tts>=6.1.0
+pyttsx3>=2.90
+coqui-tts>=0.22.0; platform_system == "Windows"
+torch>=2.1.0; platform_system == "Windows"
+
+# Text Analysis
+transformers>=4.35.0
+torch>=2.1.0
+
+# Audio Processing
+numpy>=1.24.0
+scipy>=1.11.0
+sounddevice>=0.4.6
+soundfile>=0.12.0
+
+# Windows Service & Named Pipes
+pywin32>=311; platform_system == "Windows"
+
+# IPC Communication
+psutil>=5.9.0
+
+# Async
+asyncio
+aiofiles>=23.2.0
+
+# Logging
+loguru>=0.7.2
+
+# CLI
+click>=8.1.7
+
+# Utilities
+python-dotenv>=1.0.0
+
+# Audio file handling
+pydub>=0.25.1
+
+# HTTP client for Ollama
+aiohttp>=3.9.0
+
+# Speech-to-Text
+RealtimeSTT>=0.3.0

@@ -1,0 +1,58 @@
+---
+config:
+  layout: dagre
+  theme: default
+---
+flowchart LR
+ subgraph Actors["Actors"]
+        U_cli["CLI<br>(pyjarvis_cli.client)"]
+        U_ui["UI<br>(pyjarvis_ui.app)"]
+        U_llama_cli["LLM CLI<br>(pyjarvis_llama.cli)"]
+  end
+ subgraph Shared["Shared"]
+        Config["AppConfig<br>(pyjarvis_shared.config)"]
+        Messages["IPC Message Models<br>(pyjarvis_shared.messages)"]
+  end
+ subgraph ServiceLayer["pyjarvis_service"]
+        IPC["IpcServer / Service (ipc.py, service.py)"]
+        Processor["TextProcessor<br>(processor.py)"]
+  end
+ subgraph Core["pyjarvis_core"]
+        Analyzer["TextAnalyzer<br>(text_analyzer.py)"]
+        TtsFactory["TtsProcessorFactory<br>(tts_factory.py)"]
+        TtsProcessors["TTS Processors<br>(tts_processors/*)"]
+        AudioBuffer["AudioBuffer<br>(audio_buffer.py)"]
+        Animation["AnimationController<br>(animation_controller.py)"]
+  end
+ subgraph LLMModule["pyjarvis_llama"]
+        Ollama["OllamaClient<br>(llama_client.py)"]
+        Recorder["AudioRecorder / STT<br>(audio_recorder.py)"]
+        Personas["PersonaFactory / Personas<br>(personas.py)"]
+  end
+ subgraph UIProcess["pyjarvis_ui"]
+        ServiceClient["ServiceClient<br>(service_client.py)"]
+        AudioPlayer["AudioPlayer<br>(audio_player.py)"]
+        FaceRenderer["FaceRenderer<br>(face_renderer.py)"]
+  end
+    U_cli -- "TCP: ServiceCommand.process_text" --> IPC
+    U_ui -- TCP: register/send --> ServiceClient
+    U_llama_cli -- "LLM-driven text" --> IPC
+    IPC -- for each request --> Processor
+    Processor -- analyze --> Analyzer
+    Processor -- synthesize --> TtsFactory
+    TtsFactory -- creates/dispatches --> TtsProcessors
+    TtsProcessors -- writes audio file --> AudioBuffer
+    AudioBuffer -- audio path --> IPC
+    IPC -- broadcast VoiceProcessingUpdate --> ServiceClient
+    ServiceClient -- delivers update --> U_ui
+    U_ui -- receives update --> AudioPlayer
+    AudioPlayer -- plays file --> FaceRenderer
+    AudioPlayer -- audio_level --> Animation
+    FaceRenderer -- renders frames --> Display["Display"]
+    Recorder -- transcript --> Ollama
+    Ollama -- response --> IPC
+    Personas -- persona settings --> Ollama
+    Config -- used by --- IPC & Processor
+    Messages -- used by --- IPC
+    Core --> n1["Untitled Node"]
+    classDef svc fill:#f8f9c6,stroke:#333,stroke-width:1px

@@ -17,7 +17,11 @@ A Python implementation of the Jarvis text-to-voice assistant with animated digi
 
 ## Architecture
 
-Modular Python application following Clean Architecture, SOLID principles, and Design Patterns:
+Modular Python application following Clean Architecture, SOLID principles, and Design Patterns
+
+![UI](docs/Architecture-Overview.png)
+
+### Components
 
 - **pyjarvis_shared**: Shared types, messages, and centralized configuration
 - **pyjarvis_core**: Core domain logic (text analysis, TTS processors, audio processing, animations)
@@ -25,6 +29,8 @@ Modular Python application following Clean Architecture, SOLID principles, and D
 - **pyjarvis_cli**: CLI application to send text to service
 - **pyjarvis_ui**: Desktop UI with animated robot face (Pygame)
 - **pyjarvis_llama**: LLM integration with speech recognition (Ollama + RealtimeSTT)
+
+### Components Relationship
 
 ![Architecture](docs/architecture.png)
 

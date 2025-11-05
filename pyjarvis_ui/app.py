@@ -28,7 +28,7 @@ class PyJarvisApp:
             height: Window height (if None, uses robot image dimensions)
         """
         # Load robot face image to determine window size
-        robot_image_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "robot-face.png")
+        robot_image_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "robot-face-2.png")
         
         if os.path.exists(robot_image_path):
             try:
@@ -288,7 +288,7 @@ class PyJarvisApp:
             self.screen.blit(text_bg, (5, 5))
             self.screen.blit(text_surface, (10, 10))
         
-        # Render status with background for readability
+        # Render status with background for readability (moved to right side)
         connection_status = "Connected" if self.connected_to_service else "Disconnected"
         audio_status = "Playing" if self.audio_player.is_playing else "Idle"
         status_text = f"Service: {connection_status} | Audio: {audio_status}"
@@ -296,12 +296,29 @@ class PyJarvisApp:
         status_bg = pygame.Surface((status_surface.get_width() + 10, status_surface.get_height() + 10))
         status_bg.set_alpha(128)
         status_bg.fill((0, 0, 0))
-        self.screen.blit(status_bg, (5, self.height - 35))
-        self.screen.blit(status_surface, (10, self.height - 30))
+        # Position status text on the right side
+        status_x = self.width - status_surface.get_width() - 15
+        status_y = self.height - 30
+        self.screen.blit(status_bg, (status_x - 5, status_y - 5))
+        self.screen.blit(status_surface, (status_x, status_y))
         
-        # Render connection indicator
+        # Render connection indicator in center of bottom-left circle
+        # Based on image grid: bottom-left circle center is at grid (4.5, 13.5) of (27, 18) grid
+        # Original image: 524x600, so per grid unit: x=19.41, y=33.33
+        # Original position: (87, 450) scaled to current window size
+        original_img_width = 524
+        original_img_height = 600
+        grid_x_center = 4.5  # Center of bottom-left circle horizontally
+        grid_y_center = 13.5  # Center of bottom-left circle vertically
+        original_x = (grid_x_center / 25.5) * original_img_width
+        original_y = (grid_y_center / 18.81) * original_img_height
+        # Scale to current window size
+        scale_x = self.width / original_img_width
+        scale_y = self.height / original_img_height
+        dot_x = int(original_x * scale_x)
+        dot_y = int(original_y * scale_y)
         color = (0, 255, 0) if self.connected_to_service else (255, 0, 0)
-        pygame.draw.circle(self.screen, color, (self.width - 20, 20), 8)
+        pygame.draw.circle(self.screen, color, (dot_x, dot_y), 8)
         
         pygame.display.flip()
     

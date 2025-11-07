@@ -1,11 +1,14 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](https://www.python.org/)
-[![Pygame](https://img.shields.io/badge/Pygame-2.5.0-green?logo=python)](https://www.pygame.org/)
-[![Edge TTS](https://img.shields.io/badge/Edge%20TTS-6.1.0-blue?logo=microsoft)](https://github.com/rany2/edge-tts)
-[![gTTS](https://img.shields.io/badge/gTTS-2.5.0-orange?logo=google)](https://github.com/pndurette/gTTS)
-[![RealtimeSTT](https://img.shields.io/badge/RealtimeSTT-0.3.0-yellow)](https://github.com/KoljaB/RealtimeSTT)
+[![Pygame](https://img.shields.io/badge/Pygame-2.6.1%2B-green?logo=python)](https://www.pygame.org/)
+[![Edge TTS](https://img.shields.io/badge/Edge%20TTS-7.2.3%2B-blue?logo=microsoft)](https://github.com/rany2/edge-tts)
+[![gTTS](https://img.shields.io/badge/gTTS-2.5.4%2B-orange?logo=google)](https://github.com/pndurette/gTTS)
+[![RealtimeSTT](https://img.shields.io/badge/RealtimeSTT-0.3.104%2B-yellow)](https://github.com/KoljaB/RealtimeSTT)
 [![Ollama](https://img.shields.io/badge/Ollama-Compatible-blueviolet?logo=llama)](https://ollama.ai/)
-[![Pydantic](https://img.shields.io/badge/Pydantic-2.5.0%2B-ff69b4?logo=pydantic)](https://docs.pydantic.dev/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.1.0-EE4C2C?logo=pytorch)](https://pytorch.org/)
+[![Pydantic](https://img.shields.io/badge/Pydantic-2.12.4%2B-ff69b4?logo=pydantic)](https://docs.pydantic.dev/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-up%20to%202.9.0-EE4C2C?logo=pytorch)](https://pytorch.org/)
+[![langdetect](https://img.shields.io/badge/langdetect-1.0.9%2B-lightgrey)](https://github.com/Mimino666/langdetect)
+[![aiohttp](https://img.shields.io/badge/aiohttp-3.13.2%2B-blue)](https://github.com/aio-libs/aiohttp)
+[![loguru](https://img.shields.io/badge/loguru-0.7.3%2B-green)](https://github.com/Delgan/loguru)
 
 
 # PyJarvis - AI Assistant
@@ -68,6 +71,13 @@ python -m pyjarvis_ui
 python -m pyjarvis_cli "Hello, I am Jarvis"
 ```
 
+You can also specify the language manually:
+
+```bash
+python -m pyjarvis_cli "Hola, soy Jarvis" --language es
+python -m pyjarvis_cli "Olá, eu sou Jarvis" --language pt-BR
+```
+
 ### LLM + Speech Recognition (optional)
 
 1. Start Ollama (if using local LLM):
@@ -86,8 +96,9 @@ python -m pyjarvis_llama
 In the LLM CLI you can:
 - Type messages and press Enter for text input
 - Use `/m` to record audio from microphone (press Enter to stop)
-- Use `/lang <code>` to change recognition language
+- Use `/lang <code>` to change recognition language (STT)
 - Use `/persona <name>` to change AI persona
+- **Automatic language detection**: The system automatically detects the language of LLM responses and uses the correct TTS voice
 
 ### Standalone UI
 
@@ -128,8 +139,10 @@ pyJarvis/
 
 - Animated robot face with lip-sync and emotion-driven effects
 - Multiple TTS engines (Edge-TTS default, gTTS available)
+- **Automatic language detection** for TTS (Portuguese, English, Spanish) using `langdetect` with heuristic fallback
 - STT integration via RealtimeSTT / Whisper models
 - LLM support via Ollama and configurable AI personas
+- **Multi-language support**: Automatic detection and manual override for TTS language selection
 - TCP-based IPC; UI registers for broadcast updates from service
 
 ## Configuration
@@ -140,12 +153,33 @@ All runtime configuration is centralized in `pyjarvis_shared/config.py` (AppConf
 - Edge-TTS voice mapping (`edge_tts_voices`)
 - STT model and language
 - Ollama base URL and model
+- Language detection: Uses `langdetect` library with heuristic fallback for automatic language detection
 
+
+## Language Detection
+
+PyJarvis includes automatic language detection for TTS voice selection:
+
+- **Primary method**: Uses `langdetect` library for accurate language detection
+- **Fallback**: Heuristic-based detection using language-specific patterns and keywords
+- **Supported languages**: Portuguese (pt-BR), English (en-US), Spanish (es-ES, es-MX, es-AR, etc.)
+- **Manual override**: You can specify the language manually using the `--language` flag in CLI
+
+The system automatically detects the language of:
+- Text sent via CLI (if no language is specified)
+- LLM responses in the interactive CLI (automatically detected and sent to TTS with correct language code)
+
+### Language Codes
+
+- Portuguese: `pt`, `pt-BR`, `portuguese`
+- English: `en`, `en-US`, `en-GB`, `english`
+- Spanish: `es`, `es-ES`, `es-MX`, `es-AR`, `spanish`, `español`
 
 ## Text-to-Speech (Quick notes)
 
 - Edge-TTS (Microsoft) is the default high-quality engine. Voice mapping is configurable by language.
 - gTTS (Google) is supported as a fallback (requires internet and FFmpeg for MP3→WAV conversion).
+- Automatic language detection ensures the correct voice is used for each language.
 
 
 ## Install FFmpeg
@@ -324,3 +358,5 @@ Testing checklist (manual):
 - [ ] Audio files are cleaned up (if configured)
 - [ ] LLM CLI connects to Ollama (if used)
 - [ ] Speech recognition works (`/m` in LLM CLI)
+- [ ] Language detection works correctly (test with Portuguese, English, Spanish text)
+- [ ] Manual language override works (`--language` flag in CLI)

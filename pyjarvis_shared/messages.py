@@ -30,6 +30,7 @@ class Language(str, Enum):
     """Supported languages"""
     ENGLISH = "English"
     PORTUGUESE = "Portuguese"
+    SPANISH = "Spanish"
 
 
 @dataclass

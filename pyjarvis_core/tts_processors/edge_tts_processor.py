@@ -25,6 +25,7 @@ class EdgeTtsProcessor(TtsProcessor):
     DEFAULT_VOICE_MAPPING = {
         Language.ENGLISH: "en-US-AriaNeural",  # Default English voice
         Language.PORTUGUESE: "pt-BR-FranciscaNeural",  # Default Portuguese voice
+        Language.SPANISH: "es-ES-ElviraNeural",  # Default Spanish voice
     }
     
     def __init__(self, output_dir: Path, config=None):
@@ -63,9 +64,11 @@ class EdgeTtsProcessor(TtsProcessor):
                         mapping[Language.PORTUGUESE] = voice_name
                     elif lang_code_lower in ["en", "en-us", "english"]:
                         mapping[Language.ENGLISH] = voice_name
+                    elif lang_code_lower in ["es", "es-es", "es-mx", "es-ar", "es-co", "spanish"]:
+                        mapping[Language.SPANISH] = voice_name
         
         # Fill in defaults for missing languages
-        for lang in [Language.ENGLISH, Language.PORTUGUESE]:
+        for lang in [Language.ENGLISH, Language.PORTUGUESE, Language.SPANISH]:
             if lang not in mapping:
                 mapping[lang] = self.DEFAULT_VOICE_MAPPING[lang]
         
@@ -86,8 +89,18 @@ class EdgeTtsProcessor(TtsProcessor):
             logger.debug(f"[Edge-TTS] Found {len(voices)} available voices")
             
             # Validate configured voices and update if needed
-            for lang in [Language.ENGLISH, Language.PORTUGUESE]:
-                lang_voices = [v for v in voices if lang.value.lower() in v.get("Locale", "").lower()]
+            for lang in [Language.ENGLISH, Language.PORTUGUESE, Language.SPANISH]:
+                # For Spanish, check for "es" in locale
+                if lang == Language.SPANISH:
+                    lang_voices = [v for v in voices if "es-" in v.get("Locale", "").lower()]
+                else:
+                    lang_filter = lang.value.lower()
+                    if lang == Language.PORTUGUESE:
+                        lang_filter = "pt"
+                    elif lang == Language.ENGLISH:
+                        lang_filter = "en"
+                    lang_voices = [v for v in voices if lang_filter in v.get("Locale", "").lower()]
+                
                 if lang_voices:
                     configured_voice = self.voice_mapping.get(lang)
                     
@@ -229,13 +242,16 @@ class EdgeTtsProcessor(TtsProcessor):
         voices = await edge_tts.list_voices()
         
         if language:
-            lang_filter = language.value.lower()
-            if language == Language.PORTUGUESE:
-                lang_filter = "pt"
-            elif language == Language.ENGLISH:
-                lang_filter = "en"
-            
-            voices = [v for v in voices if lang_filter in v.get("Locale", "").lower()]
+            if language == Language.SPANISH:
+                voices = [v for v in voices if "es-" in v.get("Locale", "").lower()]
+            else:
+                lang_filter = language.value.lower()
+                if language == Language.PORTUGUESE:
+                    lang_filter = "pt"
+                elif language == Language.ENGLISH:
+                    lang_filter = "en"
+                
+                voices = [v for v in voices if lang_filter in v.get("Locale", "").lower()]
         
         return voices
 

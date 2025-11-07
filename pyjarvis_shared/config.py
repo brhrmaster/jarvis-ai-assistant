@@ -30,7 +30,7 @@ class AppConfig:
     
     # Ollama LLM Configuration
     ollama_base_url: str = "http://localhost:11434"  # Ollama server URL
-    ollama_model: str = "deepseek-r1:14b" # gpt-oss:20b, llama3.2  Ollama model to use
+    ollama_model: str = "llama3.1:latest" # gpt-oss:20b, llama3.2  Ollama model to use
     ollama_persona: str = "portuguese"  # AI persona to use (jarvis, friendly, professional, portuguese)
     
     # Speech-to-Text (STT) Configuration
@@ -39,10 +39,15 @@ class AppConfig:
     
     # Edge-TTS Configuration
     edge_tts_voices: Dict[str, str] = field(default_factory=lambda: {
-        "pt-br": "pt-BR-AntonioNeural",
-        "pt": "pt-BR-AntonioNeural",
-        "en": "en-US-DerekMultilingualNeural",
-        "en-us": "en-US-DerekMultilingualNeural"
+        "pt-br": "pt-BR-LeilaNeural",
+        "pt": "pt-BR-LeilaNeural",
+        "en": "en-US-AnaNeural",
+        "en-us": "en-US-AnaNeural",
+        "es": "es-ES-ElviraNeural",
+        "es-es": "es-ES-ElviraNeural",
+        "es-mx": "es-MX-DaliaNeural",
+        "es-ar": "es-AR-ElenaNeural",
+        "es-co": "es-CO-SalomeNeural"
     })  # Voice mapping by language code
     # for a complete list of voices, execute the following command:
     # edge-tts --list-voices

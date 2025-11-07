@@ -192,7 +192,11 @@ config.edge_tts_voices = {
     "pt-br": "pt-BR-HumbertoNeural",
     "pt": "pt-BR-FranciscaNeural",
     "en": "en-US-AriaNeural",
-    "en-us": "en-US-GuyNeural"
+    "en-us": "en-US-GuyNeural",
+    "es": "es-ES-ElviraNeural",
+    "es-es": "es-ES-ElviraNeural",
+    "es-mx": "es-MX-DaliaNeural",
+    "es-ar": "es-AR-ElenaNeural"
 }
 ```
 
@@ -237,6 +241,70 @@ config.edge_tts_voices = {
 - `en-US-RogerNeural` - male
 - `en-US-SaraNeural` - female
 - `en-US-TonyNeural` - male
+
+### Spanish (es-ES) example voices
+- `es-ES-ElviraNeural` - female (padrão, Bright, Clear)
+- `es-ES-AlvaroNeural` - male (Confident, Animated)
+- `es-ES-AbrilNeural` - female
+- `es-ES-ArabellaMultilingualNeural` - female (Cheerful, Friendly, Casual, Warm, Pleasant)
+- `es-ES-ArnauNeural` - male
+- `es-ES-DarioNeural` - male
+- `es-ES-EliasNeural` - male
+- `es-ES-EstrellaNeural` - female
+- `es-ES-IreneNeural` - female (Curious, Cheerful)
+- `es-ES-IsidoraMultilingualNeural` - female (Cheerful, Friendly, Warm, Casual)
+- `es-ES-LaiaNeural` - female
+- `es-ES-LiaNeural` - female (Animated, Bright)
+- `es-ES-NilNeural` - male
+- `es-ES-SaulNeural` - male
+- `es-ES-TeoNeural` - male
+- `es-ES-TrianaNeural` - female
+- `es-ES-VeraNeural` - female
+- `es-ES-XimenaNeural` - female
+
+### Spanish (es-MX) example voices
+- `es-MX-DaliaNeural` - female (padrão)
+- `es-MX-DaliaMultilingualNeural` - female
+- `es-MX-BeatrizNeural` - female
+- `es-MX-CandelaNeural` - female
+- `es-MX-CarlotaNeural` - female
+- `es-MX-CecilioNeural` - male
+- `es-MX-GerardoNeural` - male
+- `es-MX-JorgeNeural` - male
+- `es-MX-JorgeMultilingualNeural` - male
+- `es-MX-LarissaNeural` - female
+- `es-MX-LibertoNeural` - male
+- `es-MX-LucianoNeural` - male
+- `es-MX-MarinaNeural` - female
+- `es-MX-NuriaNeural` - female
+- `es-MX-PelayoNeural` - male
+- `es-MX-RenataNeural` - female
+- `es-MX-YagoNeural` - male
+
+### Spanish (es-AR) example voices
+- `es-AR-ElenaNeural` - female (Bright, Clear)
+- `es-AR-TomasNeural` - male
+
+### Spanish (es-CO) example voices
+- `es-CO-SalomeNeural` - female
+- `es-CO-GonzaloNeural` - male
+
+### Other Spanish regional voices
+- `es-CL-CatalinaNeural` - female (Chile)
+- `es-CL-LorenzoNeural` - male (Chile)
+- `es-PE-AlexNeural` - male (Peru)
+- `es-PE-CamilaNeural` - female (Peru)
+- `es-US-AlonsoNeural` - male (US Spanish)
+- `es-US-PalomaNeural` - female (US Spanish)
+- `es-UY-MateoNeural` - male (Uruguay)
+- `es-UY-ValentinaNeural` - female (Uruguay)
+- `es-VE-PaolaNeural` - female (Venezuela)
+- `es-VE-SebastianNeural` - male (Venezuela)
+
+For a complete list of all available Spanish voices, run:
+```bash
+edge-tts --list-voices | grep "^es-"
+```
 
 ## Testing / Verification
 

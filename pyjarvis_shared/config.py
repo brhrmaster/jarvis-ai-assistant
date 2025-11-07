@@ -29,7 +29,7 @@ class AppConfig:
     audio_delete_after_playback: bool = True  # Delete audio files after playback
     
     # Ollama LLM Configuration
-    ollama_base_url: str = "http://localhost:11434"  # Ollama server URL
+    ollama_base_url: str = "http://192.168.0.23:11434"  # Ollama server URL
     ollama_model: str = "llama3.1:latest" # gpt-oss:20b, llama3.2  Ollama model to use
     ollama_persona: str = "jarvis"  # AI persona to use (jarvis, friendly, professional, red_queen, catalina, portuguese)
     

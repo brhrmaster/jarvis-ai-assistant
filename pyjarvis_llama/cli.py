@@ -379,10 +379,6 @@ async def _process_user_input_with_llm(
 
         print("\r" + " "*20 + "\r", end="")  # Clear "Thinking..." line
 
-        # Save response to context
-        if context_manager:
-            context_manager.save_response(response)
-
         # Send response to PyJarvis for TTS
         if send_text_to_service:
             print("Processing...", end="", flush=True)
@@ -398,6 +394,11 @@ async def _process_user_input_with_llm(
                 # Send to service with detected language
                 await send_text_to_service(cleaned_text, language=language_code)
                 print("\r[SUCCESS] Sent to PyJarvis!" + " "*30 + "\n")
+
+                # Save response to context
+                if context_manager:
+                    context_manager.save_response(response)
+
             except Exception as e:
                 print(f"\r[WARNING] Failed to send to PyJarvis: {e}\n")
                 logger.error(f"Failed to send to PyJarvis: {e}")

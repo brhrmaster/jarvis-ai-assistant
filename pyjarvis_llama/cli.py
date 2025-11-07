@@ -21,6 +21,81 @@ except ImportError as e:
     logger.warning(f"Failed to import pyjarvis_cli: {e}. TTS will be skipped.")
     send_text_to_service = None
 
+# Validate language code (common Whisper languages)
+valid_languages = {
+    'en', 'english', 'pt', 'portuguese', 'es', 'spanish', 
+    'fr', 'french', 'de', 'german', 'it', 'italian',
+    'ja', 'japanese', 'ko', 'korean', 'zh', 'chinese',
+    'ru', 'russian', 'ar', 'arabic', 'hi', 'hindi',
+    'tr', 'turkish', 'pl', 'polish', 'nl', 'dutch',
+    'sv', 'swedish', 'fi', 'finnish', 'no', 'norwegian'
+}
+
+# Map common language names to codes
+lang_map = {
+    'english': 'en', 'portuguese': 'pt', 'spanish': 'es',
+    'french': 'fr', 'german': 'de', 'italian': 'it',
+    'japanese': 'ja', 'korean': 'ko', 'chinese': 'zh',
+    'russian': 'ru', 'arabic': 'ar', 'hindi': 'hi',
+    'turkish': 'tr', 'polish': 'pl', 'dutch': 'nl',
+    'swedish': 'sv', 'finnish': 'fi', 'norwegian': 'no'
+}
+
+def show_initial_menu(ollama_client: OllamaClient, persona: PersonaStrategy) -> None:
+    divider = "="*60
+    print(f"[SUCCESS] Connected to Ollama at {ollama_client.base_url}")
+    print(f"- Using model: {ollama_client.model}")
+    print(f"- Using persona: {persona.name}")
+    print(f"\n{divider}")
+    print("PyJarvis AI - Interactive Mode")
+    print(divider)
+    print("Type your message and press Enter.")
+    print("The response will be sent to PyJarvis for voice synthesis.")
+    print("Commands:")
+    print("  /exit or /quit - Exit the program")
+    print("  /clear - Clear the conversation")
+    print("  /persona <name> - Change AI persona")
+    print("  /lang [code] - Set language for speech recognition (or list available)")
+    print("  /m - Record audio from microphone (press Enter to stop)")
+    print(f"  Available personas: {', '.join(PersonaFactory.list_available())}")
+    print(f"{divider}\n")
+
+def change_persona(persona: PersonaStrategy, user_input: str) -> None:
+    parts = user_input.split(maxsplit=1)
+    if len(parts) > 1:
+        new_persona_name = parts[1].strip()
+        try:
+            persona = PersonaFactory.create(new_persona_name)
+            print(f"[SUCCESS] Changed persona to: {persona.name}\n")
+        except Exception as e:
+            print(f"[ERROR] Failed to change persona: {e}\n")
+            print(f"Available personas: {', '.join(PersonaFactory.list_available())}\n")
+    else:
+        print(f"Current persona: {persona.name}")
+        print(f"Available personas: {', '.join(PersonaFactory.list_available())}\n")
+        print(f"Usage: /persona <name>\n")
+
+def change_language(current_stt_language: str, user_input: str) -> None:
+    parts = user_input.split(maxsplit=1)
+    if len(parts) > 1:
+        new_lang = parts[1].strip().lower()
+        
+        # Normalize language code
+        normalized_lang = lang_map.get(new_lang, new_lang)
+        
+        if normalized_lang in valid_languages:
+            current_stt_language = normalized_lang
+            print(f"Speech recognition language set to: {current_stt_language.upper()}\n")
+        else:
+            print(f"Language codes: {new_lang}")
+            print(f"   Supported languages: en, pt, es, fr, de, it, ja, ko, zh, ru, ar, hi, tr, pl, nl, sv, fi, no\n")
+    else:
+        print(f"Current speech recognition language: {current_stt_language.upper()}")
+        print(f"   Usage: /lang <code>")
+        print(f"   Example: /lang pt (for Portuguese)")
+        print(f"   Example: /lang en (for English)")
+        print(f"   Supported: en, pt, es, fr, de, it, ja, ko, zh, ru, ar, hi, tr, pl, nl, sv, fi, no\n")
+
 async def interactive_loop(config: AppConfig) -> None:
     """
     Interactive loop for LLM chat
@@ -37,7 +112,6 @@ async def interactive_loop(config: AppConfig) -> None:
     # Initialize conversation context
     context_manager = ConversationContext()
     
-    divider = "="*60
     
     try:
         # Test connection to Ollama
@@ -49,22 +123,7 @@ async def interactive_loop(config: AppConfig) -> None:
             print("   Start Ollama with: ollama serve")
             return
         
-        print(f"[SUCCESS] Connected to Ollama at {ollama_client.base_url}")
-        print(f"- Using model: {ollama_client.model}")
-        print(f"- Using persona: {persona.name}")
-        print(f"\n{divider}")
-        print("PyJarvis AI - Interactive Mode")
-        print(divider)
-        print("Type your message and press Enter.")
-        print("The response will be sent to PyJarvis for voice synthesis.")
-        print("Commands:")
-        print("  /exit or /quit - Exit the program")
-        print("  /clear - Clear the conversation")
-        print("  /persona <name> - Change AI persona")
-        print("  /lang [code] - Set language for speech recognition (or list available)")
-        print("  /m - Record audio from microphone (press Enter to stop)")
-        print(f"  Available personas: {', '.join(PersonaFactory.list_available())}")
-        print(f"{divider}\n")
+        show_initial_menu(ollama_client, persona)
 
         # Current STT language (can be changed during session)
         current_stt_language = getattr(config, 'stt_language', 'en')
@@ -89,61 +148,12 @@ async def interactive_loop(config: AppConfig) -> None:
                 
                 # Handle persona change
                 if user_input.lower().startswith('/persona'):
-                    parts = user_input.split(maxsplit=1)
-                    if len(parts) > 1:
-                        new_persona_name = parts[1].strip()
-                        try:
-                            persona = PersonaFactory.create(new_persona_name)
-                            print(f"[SUCCESS] Changed persona to: {persona.name}\n")
-                        except Exception as e:
-                            print(f"[ERROR] Failed to change persona: {e}\n")
-                            print(f"Available personas: {', '.join(PersonaFactory.list_available())}\n")
-                    else:
-                        print(f"Current persona: {persona.name}")
-                        print(f"Available personas: {', '.join(PersonaFactory.list_available())}\n")
-                        print(f"Usage: /persona <name>\n")
+                    change_persona(persona, user_input)
                     continue
                 
                 # Handle language selection for speech recognition
                 if user_input.lower().startswith('/lang'):
-                    parts = user_input.split(maxsplit=1)
-                    if len(parts) > 1:
-                        new_lang = parts[1].strip().lower()
-                        # Validate language code (common Whisper languages)
-                        valid_languages = {
-                            'en', 'english', 'pt', 'portuguese', 'es', 'spanish', 
-                            'fr', 'french', 'de', 'german', 'it', 'italian',
-                            'ja', 'japanese', 'ko', 'korean', 'zh', 'chinese',
-                            'ru', 'russian', 'ar', 'arabic', 'hi', 'hindi',
-                            'tr', 'turkish', 'pl', 'polish', 'nl', 'dutch',
-                            'sv', 'swedish', 'fi', 'finnish', 'no', 'norwegian'
-                        }
-                        
-                        # Map common language names to codes
-                        lang_map = {
-                            'english': 'en', 'portuguese': 'pt', 'spanish': 'es',
-                            'french': 'fr', 'german': 'de', 'italian': 'it',
-                            'japanese': 'ja', 'korean': 'ko', 'chinese': 'zh',
-                            'russian': 'ru', 'arabic': 'ar', 'hindi': 'hi',
-                            'turkish': 'tr', 'polish': 'pl', 'dutch': 'nl',
-                            'swedish': 'sv', 'finnish': 'fi', 'norwegian': 'no'
-                        }
-                        
-                        # Normalize language code
-                        normalized_lang = lang_map.get(new_lang, new_lang)
-                        
-                        if normalized_lang in valid_languages:
-                            current_stt_language = normalized_lang
-                            print(f"🌐 Speech recognition language set to: {current_stt_language.upper()}\n")
-                        else:
-                            print(f"Language codes: {new_lang}")
-                            print(f"   Supported languages: en, pt, es, fr, de, it, ja, ko, zh, ru, ar, hi, tr, pl, nl, sv, fi, no\n")
-                    else:
-                        print(f"🌐 Current speech recognition language: {current_stt_language.upper()}")
-                        print(f"   Usage: /lang <code>")
-                        print(f"   Example: /lang pt (for Portuguese)")
-                        print(f"   Example: /lang en (for English)")
-                        print(f"   Supported: en, pt, es, fr, de, it, ja, ko, zh, ru, ar, hi, tr, pl, nl, sv, fi, no\n")
+                    change_language(current_stt_language, user_input)
                     continue
                 
                 # Handle microphone recording
@@ -210,8 +220,8 @@ async def record_and_process_audio(
         
         status_messages = {
             RecordingStatus.INITIALIZING: "\nPreparing buffer for recording...",
-            RecordingStatus.RECORDING: "\n🎤 Listening... (Press Enter to stop recording)",
-            RecordingStatus.PROCESSING: "\n⏳ Processing transcription...",
+            RecordingStatus.RECORDING: "\nListening... (Press Enter to stop recording)",
+            RecordingStatus.PROCESSING: "\nProcessing transcription...",
             RecordingStatus.COMPLETED: "",  # No message needed
             RecordingStatus.FAILED: "\n[ERROR] Recording failed"
         }

@@ -11,8 +11,8 @@ pygame>=2.6.1
 # TTS Engine
 gtts>=2.5.4
 edge-tts>=7.2.3
-pyttsx3>=2.99
-coqui-tts>=0.27.2
+#pyttsx3>=2.99
+#coqui-tts>=0.27.2
 
 # Text Analysis
 transformers<=4.56.0

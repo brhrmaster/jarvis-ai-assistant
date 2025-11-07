@@ -31,11 +31,11 @@ class AppConfig:
     # Ollama LLM Configuration
     ollama_base_url: str = "http://localhost:11434"  # Ollama server URL
     ollama_model: str = "llama3.1:latest" # gpt-oss:20b, llama3.2  Ollama model to use
-    ollama_persona: str = "portuguese"  # AI persona to use (jarvis, friendly, professional, portuguese)
+    ollama_persona: str = "jarvis"  # AI persona to use (jarvis, friendly, professional, red_queen, catalina, portuguese)
     
     # Speech-to-Text (STT) Configuration
     stt_model: str = "base"  # Whisper model to use (base, small, medium, large)
-    stt_language: str = "pt"  # Default language for speech-to-text (en, pt, etc.)
+    stt_language: str = "en"  # Default language for speech-to-text (en, pt, es, fr, de, it, etc.)
     
     # Edge-TTS Configuration
     edge_tts_voices: Dict[str, str] = field(default_factory=lambda: {

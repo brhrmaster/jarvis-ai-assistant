@@ -37,22 +37,24 @@ async def interactive_loop(config: AppConfig) -> None:
     # Initialize conversation context
     context_manager = ConversationContext()
     
+    divider = "="*60
+    
     try:
         # Test connection to Ollama
         print("\n🔌 Testing connection to Ollama server...")
         connected = await ollama_client.test_connection()
         if not connected:
-            print("❌ Failed to connect to Ollama server!")
+            print("[ERROR] Failed to connect to Ollama server!")
             print(f"   Make sure Ollama is running at {ollama_client.base_url}")
             print("   Start Ollama with: ollama serve")
             return
         
-        print(f"✅ Connected to Ollama at {ollama_client.base_url}")
-        print(f"📦 Using model: {ollama_client.model}")
-        print(f"🎭 Using persona: {persona.name}")
-        print("\n" + "="*60)
-        print("PyJarvis LLM CLI - Interactive Mode")
-        print("="*60)
+        print(f"[SUCCESS] Connected to Ollama at {ollama_client.base_url}")
+        print(f"- Using model: {ollama_client.model}")
+        print(f"- Using persona: {persona.name}")
+        print(f"\n{divider}")
+        print("PyJarvis AI - Interactive Mode")
+        print(divider)
         print("Type your message and press Enter.")
         print("The response will be sent to PyJarvis for voice synthesis.")
         print("Commands:")
@@ -62,7 +64,7 @@ async def interactive_loop(config: AppConfig) -> None:
         print("  /lang [code] - Set language for speech recognition (or list available)")
         print("  /m - Record audio from microphone (press Enter to stop)")
         print(f"  Available personas: {', '.join(PersonaFactory.list_available())}")
-        print("="*60 + "\n")
+        print(f"{divider}\n")
 
         # Current STT language (can be changed during session)
         current_stt_language = getattr(config, 'stt_language', 'en')
@@ -82,7 +84,7 @@ async def interactive_loop(config: AppConfig) -> None:
                 
                 if user_input.lower() == '/clear':
                     context_manager.clear_all_contexts()
-                    print("💭 Conversation history cleared.\n")
+                    print("Conversation history cleared!\n")
                     continue
                 
                 # Handle persona change
@@ -92,9 +94,9 @@ async def interactive_loop(config: AppConfig) -> None:
                         new_persona_name = parts[1].strip()
                         try:
                             persona = PersonaFactory.create(new_persona_name)
-                            print(f"🎭 Changed persona to: {persona.name}\n")
+                            print(f"[SUCCESS] Changed persona to: {persona.name}\n")
                         except Exception as e:
-                            print(f"❌ Failed to change persona: {e}\n")
+                            print(f"[ERROR] Failed to change persona: {e}\n")
                             print(f"Available personas: {', '.join(PersonaFactory.list_available())}\n")
                     else:
                         print(f"Current persona: {persona.name}")
@@ -149,7 +151,7 @@ async def interactive_loop(config: AppConfig) -> None:
                     try:
                         await record_and_process_audio(ollama_client, persona, config, current_stt_language, context_manager)
                     except Exception as e:
-                        print(f"❌ Error during audio recording: {e}\n")
+                        print(f"[ERROR] Error during audio recording: {e}\n")
                         logger.error(f"Audio recording error: {e}")
                     continue
                 
@@ -211,7 +213,7 @@ async def record_and_process_audio(
             RecordingStatus.RECORDING: "\n🎤 Listening... (Press Enter to stop recording)",
             RecordingStatus.PROCESSING: "\n⏳ Processing transcription...",
             RecordingStatus.COMPLETED: "",  # No message needed
-            RecordingStatus.FAILED: "\n❌ Recording failed"
+            RecordingStatus.FAILED: "\n[ERROR] Recording failed"
         }
         
         message = status_messages.get(status)
@@ -269,11 +271,11 @@ async def record_and_process_audio(
     
     # Handle result (Clean Code: early returns, clear error handling)
     if not result:
-        print("⚠️  Recording timeout or no result received.\n")
+        print("[WARNING]  Recording timeout or no result received.\n")
         return
     
     if not result.success:
-        print(f"❌ Recording error: {result.error_message}\n")
+        print(f"[ERROR] Recording error: {result.error_message}\n")
         return
     
     # Combine transcribed text from result and chunks
@@ -283,7 +285,7 @@ async def record_and_process_audio(
         _print_no_speech_tips()
         return
     
-    print(f"📝 Transcribed: {transcribed_text}\n")
+    print(f"[SUCCESS] Transcribed: {transcribed_text}\n")
     
     # Continue with LLM processing using extracted method (Clean Code)
     await _process_user_input_with_llm(
@@ -296,7 +298,7 @@ async def record_and_process_audio(
 
 def _print_no_speech_tips() -> None:
     """Print tips when no speech is detected (Extract Method refactoring)"""
-    print("⚠️  No speech detected or transcription failed.")
+    print("[WARNING] No speech detected or transcription failed.")
     print("   Tips:")
     print("   - Make sure your microphone is working")
     print("   - Speak clearly and at a normal volume")
@@ -350,20 +352,20 @@ async def _process_user_input_with_llm(
 
         # Send response to PyJarvis for TTS
         if send_text_to_service:
-            print("🔊 Processing...", end="", flush=True)
+            print("Processing...", end="", flush=True)
             try:
                 # Clean the response text before saving
                 cleaned_text = context_manager.clean_text(response) if context_manager else response
                 await send_text_to_service(cleaned_text)
-                print("\r✅ Sent to PyJarvis!" + " "*30 + "\n")
+                print("\r[SUCCESS] Sent to PyJarvis!" + " "*30 + "\n")
             except Exception as e:
-                print(f"\r⚠️  Failed to send to PyJarvis: {e}\n")
+                print(f"\r[WARNING] Failed to send to PyJarvis: {e}\n")
                 logger.error(f"Failed to send to PyJarvis: {e}")
         else:
-            print("⚠️  pyjarvis_cli not available, skipping TTS\n")
+            print("[WARNING] pyjarvis_cli not available, skipping TTS\n")
             logger.warning("pyjarvis_cli not available, skipping TTS")
     except Exception as e:
-        print(f"\r❌ Error: {e}\n")
+        print(f"\r[ERROR] Error: {e}\n")
         logger.error(f"Ollama generation error: {e}")
 
 def main() -> None:

@@ -23,14 +23,16 @@ class TestAudioBuffer:
     def test_add_audio_data(self, buffer):
         """Test adding audio data to buffer"""
         audio_data = np.array([1, 2, 3, 4, 5], dtype=np.int16)
-        buffer.add_audio_data(audio_data)
-        # Add assertions based on implementation
+        buffer.append(audio_data.tobytes())  # Use append instead of add_audio_data, convert to bytes
+        assert buffer.len() > 0
     
     def test_get_audio_data(self, buffer):
         """Test getting audio data from buffer"""
-        data = buffer.get_audio_data()
+        audio_data = np.array([1, 2, 3, 4, 5], dtype=np.int16)
+        buffer.append(audio_data.tobytes())
+        data = buffer.get_data()  # Use get_data instead of get_audio_data
         assert data is not None
-        # Add more specific assertions based on implementation
+        assert len(data) > 0
     
     def test_clear_buffer(self, buffer):
         """Test clearing the buffer"""
@@ -39,7 +41,7 @@ class TestAudioBuffer:
     
     def test_buffer_size(self, buffer):
         """Test getting buffer size"""
-        size = buffer.size()
+        size = buffer.len()  # Use len() instead of size()
         assert isinstance(size, int)
         assert size >= 0
 

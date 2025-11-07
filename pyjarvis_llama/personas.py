@@ -42,7 +42,7 @@ class PersonaStrategy(ABC):
     @property
     def style_guidelines(self) -> str:
         return (
-            "Language: Mirror user's language automatically; if unclear, default to Brazilian Portuguese.\n"
+            "Language: Mirror user's language automatically; if unclear, default to US English.\n"
             "Voice/TTS:\n"
             "- Prefer sentences of 8–16 words; avoid nested clauses.\n"
             "- Put the main answer first; details follow in short paragraphs.\n"

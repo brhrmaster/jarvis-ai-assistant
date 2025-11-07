@@ -22,18 +22,24 @@ class TestAnimationController:
     
     def test_update_emotion(self, controller):
         """Test updating emotion"""
-        controller.update_emotion(Emotion.HAPPY)
-        # Add assertions based on implementation
+        controller.set_emotion(Emotion.HAPPY)  # Use set_emotion instead of update_emotion
+        assert controller.emotion == Emotion.HAPPY
     
     def test_get_animation_state(self, controller):
         """Test getting current animation state"""
-        state = controller.get_animation_state()
+        state = controller.get_state()  # Use get_state instead of get_animation_state
         assert state is not None
-        # Add more specific assertions based on implementation
+        assert hasattr(state, 'emotion')
+        assert hasattr(state, 'eye_blink')
+        assert hasattr(state, 'mouth_open')
     
     def test_reset_animation(self, controller):
         """Test resetting animation"""
-        controller.reset_animation()
-        # Add assertions based on implementation
+        # AnimationController doesn't have reset_animation method
+        # We can test by setting emotion and checking state
+        controller.set_emotion(Emotion.HAPPY)
+        assert controller.emotion == Emotion.HAPPY
+        controller.set_emotion(Emotion.NEUTRAL)
+        assert controller.emotion == Emotion.NEUTRAL
 
 

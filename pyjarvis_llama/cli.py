@@ -41,7 +41,7 @@ async def interactive_loop(config: AppConfig) -> None:
     
     try:
         # Test connection to Ollama
-        print("\n🔌 Testing connection to Ollama server...")
+        print("\n[INFO] Testing connection to Ollama server...")
         connected = await ollama_client.test_connection()
         if not connected:
             print("[ERROR] Failed to connect to Ollama server!")

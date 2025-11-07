@@ -11,7 +11,7 @@ class TestAudioConfig:
     def test_audio_config_default_values(self):
         """Test AudioConfig with default values"""
         config = AudioConfig()
-        assert config.sample_rate == 22050
+        assert config.sample_rate == 44100  # Default is 44100, not 22050
         assert config.channels == 1
         assert config.format == "int16"
     
@@ -61,7 +61,8 @@ class TestAppConfig:
         """Test edge_tts_voices configuration"""
         assert "pt-br" in app_config.edge_tts_voices
         assert "en" in app_config.edge_tts_voices
-        assert app_config.edge_tts_voices["pt-br"] == "pt-BR-AntonioNeural"
-        assert app_config.edge_tts_voices["en"] == "en-US-DerekMultilingualNeural"
+        # Check actual default values from config.py
+        assert app_config.edge_tts_voices["pt-br"] == "pt-BR-LeilaNeural"
+        assert app_config.edge_tts_voices["en"] == "en-US-AnaNeural"
 
 

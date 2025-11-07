@@ -21,18 +21,16 @@ class TestTextToVoiceRequest:
         request = TextToVoiceRequest(text="Hello, world!")
         assert request.text == "Hello, world!"
         assert request.language is None
-        assert request.emotion is None
+        # TextToVoiceRequest doesn't have emotion field
     
     def test_text_to_voice_request_with_options(self):
-        """Test creating a TextToVoiceRequest with language and emotion"""
+        """Test creating a TextToVoiceRequest with language"""
         request = TextToVoiceRequest(
             text="Hello",
-            language=Language.ENGLISH,
-            emotion=Emotion.HAPPY
+            language="en"  # language is Optional[str], not Language enum
         )
         assert request.text == "Hello"
-        assert request.language == Language.ENGLISH
-        assert request.emotion == Emotion.HAPPY
+        assert request.language == "en"
 
 
 class TestVoiceProcessingUpdate:
@@ -41,12 +39,10 @@ class TestVoiceProcessingUpdate:
     def test_voice_processing_update_creation(self):
         """Test creating a VoiceProcessingUpdate"""
         update = VoiceProcessingUpdate(
-            status=ProcessingStatus.PROCESSING,
-            message="Processing text..."
+            status=ProcessingStatus.ANALYZING  # Use ANALYZING instead of PROCESSING
         )
-        assert update.status == ProcessingStatus.PROCESSING
-        assert update.message == "Processing text..."
-        assert update.audio_file is None
+        assert update.status == ProcessingStatus.ANALYZING
+        assert update.audio_file_path is None
         assert update.subject is None
 
 
@@ -55,9 +51,11 @@ class TestServiceCommand:
     
     def test_service_command_process_text(self):
         """Test creating a ProcessText command"""
-        command = ServiceCommand.process_text("Hello, world!")
+        request = TextToVoiceRequest(text="Hello, world!")
+        command = ServiceCommand.process_text(request)
         assert command.command_type == "ProcessText"
-        assert command.text == "Hello, world!"
+        assert command.request is not None
+        assert command.request["text"] == "Hello, world!"
     
     def test_service_command_ping(self):
         """Test creating a Ping command"""
@@ -66,10 +64,11 @@ class TestServiceCommand:
     
     def test_service_command_serialization(self):
         """Test ServiceCommand JSON serialization"""
-        command = ServiceCommand.process_text("Test")
+        request = TextToVoiceRequest(text="Test")
+        command = ServiceCommand.process_text(request)
         json_data = command.model_dump()
         assert json_data["command_type"] == "ProcessText"
-        assert json_data["text"] == "Test"
+        assert json_data["request"]["text"] == "Test"
 
 
 class TestServiceResponse:
@@ -78,11 +77,10 @@ class TestServiceResponse:
     def test_service_response_creation(self):
         """Test creating a ServiceResponse"""
         response = ServiceResponse(
-            success=True,
-            message="Operation completed"
+            response_type="Ack"  # ServiceResponse requires response_type
         )
-        assert response.success is True
-        assert response.message == "Operation completed"
-        assert response.data is None
+        assert response.response_type == "Ack"
+        assert response.update is None
+        assert response.error is None
 
 

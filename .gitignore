@@ -45,4 +45,5 @@ logs/
 Thumbs.db
 
 extras/
-contexts/*
+context_*
+tests/**coverage*

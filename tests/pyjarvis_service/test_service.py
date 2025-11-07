@@ -13,10 +13,24 @@ class TestService:
     @pytest.mark.asyncio
     async def test_run_service(self, app_config):
         """Test running the service"""
-        with patch('pyjarvis_service.service.IpcServer') as mock_ipc, \
-             patch('pyjarvis_service.service.TextProcessor') as mock_processor, \
-             patch('asyncio.sleep') as mock_sleep:
-            mock_sleep.side_effect = KeyboardInterrupt()
+        with patch('pyjarvis_service.service.TextProcessor') as mock_processor_class, \
+             patch('pyjarvis_service.service.IpcServer') as mock_ipc_class:
+            
+            # Mock processor
+            mock_processor = Mock()
+            mock_processor.initialize = AsyncMock()
+            mock_processor_class.return_value = mock_processor
+            
+            # Mock IPC server
+            mock_ipc = Mock()
+            mock_ipc.start = AsyncMock()
+            mock_ipc_class.return_value = mock_ipc
+            
+            # Mock start to raise KeyboardInterrupt quickly
+            async def mock_start(processor):
+                raise KeyboardInterrupt()
+            
+            mock_ipc.start = mock_start
             
             try:
                 await run_service()
@@ -26,11 +40,18 @@ class TestService:
     @pytest.mark.asyncio
     async def test_service_initialization(self, app_config):
         """Test service initialization"""
-        with patch('pyjarvis_service.service.IpcServer') as mock_ipc:
-            mock_server = AsyncMock()
-            mock_ipc.return_value = mock_server
+        with patch('pyjarvis_service.service.TextProcessor') as mock_processor_class, \
+             patch('pyjarvis_service.service.IpcServer') as mock_ipc_class:
             
-            # Test service setup
-            assert mock_ipc is not None
+            mock_processor = Mock()
+            mock_processor.initialize = AsyncMock()
+            mock_processor_class.return_value = mock_processor
+            
+            mock_ipc = Mock()
+            mock_ipc_class.return_value = mock_ipc
+            
+            # Test that classes can be instantiated
+            assert mock_processor_class is not None
+            assert mock_ipc_class is not None
 
 

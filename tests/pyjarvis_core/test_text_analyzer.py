@@ -54,8 +54,13 @@ class TestTextAnalyzer:
     @pytest.mark.asyncio
     async def test_analyze_text(self, analyzer):
         """Test full text analysis"""
-        result = await analyzer.analyze("Hello, world!")
-        assert result is not None
-        # Add more specific assertions based on implementation
+        # TextAnalyzer doesn't have analyze method
+        # Test by calling detect_emotion and detect_language separately
+        emotion = await analyzer.detect_emotion("Hello, world!")
+        language = await analyzer.detect_language("Hello, world!")
+        assert emotion is not None
+        assert language is not None
+        assert isinstance(emotion, Emotion)
+        assert isinstance(language, Language)
 
 

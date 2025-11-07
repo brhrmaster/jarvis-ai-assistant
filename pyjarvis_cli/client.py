@@ -94,33 +94,12 @@ async def _send_via_tcp(command: ServiceCommand, config: AppConfig) -> None:
         raise
 
 def _handle_response(response: ServiceResponse) -> None:
-    """Handle service response
-    if response.response_type == "Ack":
-        logger.info("[CLI] Service acknowledged request")
-    elif response.response_type == "Update":
-        if response.update:
-            update_dict = response.update
-            status = update_dict.get("status", "Unknown")
-            logger.info(f"[CLI] Received processing update: {status}")
-            
-            emotion = update_dict.get("emotion")
-            if emotion:
-                logger.info(f"[CLI] Detected emotion: {emotion}")
-            audio_data_hex = update_dict.get("audio_data")
-            if audio_data_hex:
-                audio_size = len(audio_data_hex) // 2  # Hex encoding doubles size
-                logger.info(f"[CLI] Received audio data: {audio_size} bytes")
-            else:
-                logger.warning("[CLI] No audio data in response")
-    """
     if response.response_type == "Error":
         error_msg = response.error or "Unknown error"
         logger.error(f"[CLI] Service returned error: {error_msg}")
         raise RuntimeError(f"Service error: {error_msg}")
     elif response.response_type == "Pong":
         logger.debug("[CLI] Received Pong response")
-    #else:
-    #    logger.warning(f"[CLI] Unexpected response type: {response.response_type}")
 
 def main() -> None:
     """CLI entry point"""

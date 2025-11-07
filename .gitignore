@@ -47,3 +47,6 @@ Thumbs.db
 extras/
 context_*
 tests/**coverage*
+
+# Audio
+audio/*

@@ -4,7 +4,7 @@ Ollama LLM client for generating responses
 
 import aiohttp
 import json
-from typing import Optional, Dict, Any
+from typing import Optional
 from loguru import logger
 from pyjarvis_shared import AppConfig
 

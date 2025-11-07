@@ -59,8 +59,14 @@ class TextProcessor:
             lang_code = request.language.lower()
             if lang_code in ["pt-br", "pt", "portuguese"]:
                 language = Language.PORTUGUESE
-            else:
+            elif lang_code in ["es", "es-es", "es-mx", "espanol", "spanish", "español"]:
+                language = Language.SPANISH
+            elif lang_code in ["en", "en-us", "en-gb", "english"]:
                 language = Language.ENGLISH
+            else:
+                # If language code is provided but not recognized, try to detect from text
+                logger.warning(f"[PIPELINE] Unknown language code '{lang_code}', detecting from text")
+                language = await self.text_analyzer.detect_language(request.text)
         else:
             language = await self.text_analyzer.detect_language(request.text)
         

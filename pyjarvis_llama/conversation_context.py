@@ -97,6 +97,7 @@ class ConversationContext:
         text = text.replace('–', '-')   # Replace en-dash (U+2013) with regular dash
         text = text.replace('"', '"')    # Replace left double quotation mark
         text = text.replace('"', '"')    # Replace right double quotation mark
+        text = text.replace('*', '')    # Replace star mark
         
         # Normalize whitespace: replace multiple spaces with single space (but preserve line breaks)
         lines = text.split('\n')

@@ -15,7 +15,7 @@ edge-tts>=7.2.3
 #coqui-tts>=0.27.2
 
 # Text Analysis
-transformers<=4.56.0
+langdetect>=1.0.9
 torch<=2.9.0
 
 # Audio Processing

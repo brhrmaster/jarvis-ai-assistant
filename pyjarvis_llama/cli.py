@@ -7,7 +7,8 @@ import sys
 import threading
 from typing import Optional
 from loguru import logger
-from pyjarvis_shared import AppConfig
+from pyjarvis_shared import AppConfig, Language
+from pyjarvis_core import TextAnalyzer
 from .llama_client import OllamaClient
 from .personas import PersonaFactory, PersonaStrategy
 from .conversation_context import ConversationContext
@@ -60,13 +61,14 @@ def show_initial_menu(ollama_client: OllamaClient, persona: PersonaStrategy) -> 
     print(f"  Available personas: {', '.join(PersonaFactory.list_available())}")
     print(f"{divider}\n")
 
-def change_persona(persona: PersonaStrategy, user_input: str) -> None:
+def change_persona(persona: PersonaStrategy, user_input: str) -> PersonaStrategy:
     parts = user_input.split(maxsplit=1)
     if len(parts) > 1:
         new_persona_name = parts[1].strip()
         try:
             persona = PersonaFactory.create(new_persona_name)
             print(f"[SUCCESS] Changed persona to: {persona.name}\n")
+            return persona
         except Exception as e:
             print(f"[ERROR] Failed to change persona: {e}\n")
             print(f"Available personas: {', '.join(PersonaFactory.list_available())}\n")
@@ -148,9 +150,11 @@ async def interactive_loop(config: AppConfig) -> None:
                 
                 # Handle persona change
                 if user_input.lower().startswith('/persona'):
-                    change_persona(persona, user_input)
+                    persona = change_persona(persona, user_input)
+                    if persona is None:
+                        persona = PersonaFactory.create('jarvis')
                     continue
-                
+
                 # Handle language selection for speech recognition
                 if user_input.lower().startswith('/lang'):
                     change_language(current_stt_language, user_input)
@@ -317,6 +321,24 @@ def _print_no_speech_tips() -> None:
     logger.warning("No transcribed text received from recorder")
 
 
+def _language_to_code(language: Language) -> str:
+    """
+    Convert Language enum to language code for TTS service
+    
+    Args:
+        language: Language enum value
+        
+    Returns:
+        Language code string (e.g., "pt-BR", "en", "es")
+    """
+    mapping = {
+        Language.PORTUGUESE: "pt-BR",
+        Language.ENGLISH: "en",
+        Language.SPANISH: "es"
+    }
+    return mapping.get(language, "en")  # Default to English if unknown
+
+
 async def _process_user_input_with_llm(
     user_input: str,
     ollama_client: OllamaClient,
@@ -354,11 +376,12 @@ async def _process_user_input_with_llm(
     # Generate response from Ollama
     try:
         response = await ollama_client.generate(prompt)
-        
+
+        print("\r" + " "*20 + "\r", end="")  # Clear "Thinking..." line
+
         # Save response to context
         if context_manager:
             context_manager.save_response(response)
-        print("\r" + " "*20 + "\r", end="")  # Clear "Thinking..." line
 
         # Send response to PyJarvis for TTS
         if send_text_to_service:
@@ -366,7 +389,14 @@ async def _process_user_input_with_llm(
             try:
                 # Clean the response text before saving
                 cleaned_text = context_manager.clean_text(response) if context_manager else response
-                await send_text_to_service(cleaned_text)
+                
+                # Detect language of the response using TextAnalyzer
+                text_analyzer = TextAnalyzer()
+                detected_language = await text_analyzer.detect_language(cleaned_text)
+                language_code = _language_to_code(detected_language)
+
+                # Send to service with detected language
+                await send_text_to_service(cleaned_text, language=language_code)
                 print("\r[SUCCESS] Sent to PyJarvis!" + " "*30 + "\n")
             except Exception as e:
                 print(f"\r[WARNING] Failed to send to PyJarvis: {e}\n")
